@@ -1,0 +1,252 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Modern Design System */
+
+@layer base {
+  :root {
+    /* Core Colors */
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.2138 0.0019 286.2347);
+
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.2138 0.0019 286.2347);
+
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.2138 0.0019 286.2347);
+
+    --primary: oklch(0.4655 0.3041 264.1963);
+    --primary-foreground: oklch(1 0 0);
+
+    --secondary: oklch(0.9 0.01 240);
+    --secondary-foreground: oklch(0.2 0.02 240);
+
+    --muted: oklch(0.9702 0 0);
+    --muted-foreground: oklch(0.2138 0.0019 286.2347);
+
+    --accent: oklch(0.9702 0 0);
+    --accent-foreground: oklch(0.2138 0.0019 286.2347);
+
+    --destructive: oklch(0.5379 0.2186 25.9751);
+    --destructive-foreground: oklch(1 0 0);
+
+    --border: oklch(0.9647 0.0157 250.5473);
+    --input: oklch(0.9647 0.0157 250.5473);
+    --ring: oklch(0.4655 0.3041 264.1963);
+
+    --radius: 0.625rem;
+
+    /* STB Brand Colors */
+    --stb-teal: 256 72% 8%;     /* Midnight Violet #120227 */
+    --stb-purple: 218 49% 45%;  /* Digital Blue #3B5BA7 */
+    --stb-green: 142 71% 45%;
+    --stb-red: 348 83% 47%;
+    --stb-gray: 213 27% 84%;
+
+    /* Sidebar */
+    --sidebar-background: oklch(0.9851 0 0);
+    --sidebar-foreground: oklch(0.2138 0.0019 286.2347);
+    --sidebar-primary: oklch(0.4655 0.3041 264.1963);
+    --sidebar-primary-foreground: oklch(1 0 0);
+    --sidebar-accent: oklch(0.9702 0 0);
+    --sidebar-accent-foreground: oklch(0.2138 0.0019 286.2347);
+    --sidebar-border: oklch(0.9647 0.0157 250.5473);
+    --sidebar-ring: oklch(0.4655 0.3041 264.1963);
+
+    /* Typography */
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  }
+
+  .dark {
+    /* Core Colors */
+    --background: oklch(0.2138 0.0019 286.2347);
+    --foreground: oklch(0.9851 0 0);
+
+    --card: oklch(0.2138 0.0019 286.2347);
+    --card-foreground: oklch(0.9851 0 0);
+
+    --popover: oklch(0.2138 0.0019 286.2347);
+    --popover-foreground: oklch(0.9851 0 0);
+
+    --primary: oklch(0.4655 0.3041 264.1963);
+    --primary-foreground: oklch(0.9851 0 0);
+
+    --secondary: oklch(0.25 0.01 240);
+    --secondary-foreground: oklch(0.9851 0 0);
+
+    --muted: oklch(0.3 0.005 286);
+    --muted-foreground: oklch(0.7 0.01 286);
+
+    --accent: oklch(0.3 0.005 286);
+    --accent-foreground: oklch(0.9851 0 0);
+
+    --destructive: oklch(0.5379 0.2186 25.9751);
+    --destructive-foreground: oklch(0.9851 0 0);
+
+    --border: oklch(0.9647 0.0157 250.5473);
+    --input: oklch(0.9647 0.0157 250.5473);
+    --ring: oklch(0.4655 0.3041 264.1963);
+
+    /* Sidebar Dark */
+    --sidebar-background: oklch(0.2138 0.0019 286.2347);
+    --sidebar-foreground: oklch(0.9851 0 0);
+    --sidebar-primary: oklch(0.4878 0.2432 264.4045);
+    --sidebar-primary-foreground: oklch(0.9851 0 0);
+    --sidebar-accent: oklch(0.3 0.005 286);
+    --sidebar-accent-foreground: oklch(0.9851 0 0);
+    --sidebar-border: oklch(0.9647 0.0157 250.5473);
+    --sidebar-ring: oklch(0.4878 0.2432 264.4045);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .stb-gradient {
+    background: linear-gradient(135deg, hsl(var(--stb-teal)) 0%, hsl(var(--stb-purple)) 100%);
+  }
+  
+  .card-hover {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-1;
+  }
+
+  /* Button utility classes for improved visibility */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 border-0 shadow-sm;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 border-0 shadow-sm;
+  }
+
+  .btn-outline {
+    @apply border-2 border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground shadow-sm;
+  }
+
+  .btn-stb {
+    @apply bg-stb-purple text-white hover:bg-stb-purple/90 border-0 shadow-sm;
+  }
+
+  .btn-stb-outline {
+    @apply border-2 border-stb-teal text-stb-teal bg-transparent hover:bg-stb-teal hover:text-white shadow-sm;
+  }
+
+  /* Responsive text truncation */
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  /* Responsive spacing utilities */
+  .space-y-responsive > * + * {
+    @apply mt-3 sm:mt-4 lg:mt-6;
+  }
+
+  /* Mobile-first responsive containers */
+  .container-responsive {
+    @apply w-full mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl;
+  }
+
+  /* Safe area for mobile devices with notches */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Touch-friendly sizing */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+
+  /* Better focus indicators for accessibility */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2;
+  }
+}
+
+/* Custom responsive breakpoints for specific components */
+@media (max-width: 380px) {
+  .text-xs-mobile {
+    font-size: 0.75rem;
+    line-height: 1rem;
+  }
+}
+
+/* Improved mobile menu animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.3s ease-out;
+}
+
+/* Enhance scrolling on mobile */
+@supports (-webkit-overflow-scrolling: touch) {
+  .smooth-scroll {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Prevent horizontal scroll on small screens */
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Better mobile table styling */
+@media (max-width: 768px) {
+  .mobile-table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+  
+  .mobile-table-scroll::-webkit-scrollbar {
+    height: 3px;
+  }
+  
+  .mobile-table-scroll::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+  }
+}
