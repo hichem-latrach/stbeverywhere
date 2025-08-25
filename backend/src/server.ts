@@ -8,6 +8,7 @@ import path from 'path';
 // Import middlewares
 import { errorHandler } from './middlewares/errorHandler';
 import { notFoundHandler } from './middlewares/notFoundHandler';
+import { rateLimiter } from './middlewares/rateLimiter';
 
 // Import routes
 import authRoutes from './routes/auth';
@@ -34,7 +35,10 @@ app.use(cors({
   credentials: true
 }));
 
-// Logging middleware
+// Rate limiting
+app.use(rateLimiter);
+
+// Logging
 app.use(morgan('combined'));
 
 // Body parsing middleware
@@ -53,7 +57,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
+// API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
@@ -71,7 +75,7 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 STB Backend Server running on port ${PORT}`);
+  console.log(`🚀 STB Banking API Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
 });
