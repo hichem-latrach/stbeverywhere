@@ -1,88 +1,106 @@
 import { Request, Response, NextFunction } from 'express';
-import { verifyAccessToken } from '@/utils/jwt';
-import { prisma } from '@/server';
-import { AuthenticatedRequest } from '@/types';
+import { verifyAccessToken } from '../utils/jwt';
+import { PrismaClient } from '@prisma/client';
+import { AuthenticatedRequest, AppError } from '../types';
 
-export const authenticateToken = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+const prisma = new PrismaClient();
+
+export const authenticate = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
-
-    if (!token) {
-      res.status(401).json({
-        success: false,
-        message: 'Access token required'
-      });
-      return;
+    
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError('Access token required', 401);
     }
 
+    const token = authHeader.substring(7);
     const payload = verifyAccessToken(token);
     
-    // Fetch user from database
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
       select: {
         id: true,
         email: true,
         fullName: true,
-        firstName: true,
         role: true,
         status: true,
-        isVerified: true
+        isEmailVerified: true,
       }
     });
 
     if (!user) {
-      res.status(401).json({
-        success: false,
-        message: 'User not found'
-      });
-      return;
+      throw new AppError('User not found', 401);
     }
 
     if (user.status !== 'ACTIVE') {
-      res.status(403).json({
-        success: false,
-        message: 'Account is suspended or inactive'
-      });
-      return;
+      throw new AppError('Account is not active', 401);
     }
 
     req.user = user as any;
     next();
   } catch (error) {
-    res.status(401).json({
+    if (error instanceof AppError) {
+      return res.status(error.statusCode).json({
+        success: false,
+        message: error.message
+      });
+    }
+    
+    return res.status(401).json({
       success: false,
       message: 'Invalid or expired token'
     });
   }
 };
 
-export const requireRole = (roles: string[]) => {
-  return (req: AuthenticatedRequest, res: Response, next: NextFunction): void => {
+export const authorize = (...roles: string[]) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
-      res.status(401).json({
+      return res.status(401).json({
         success: false,
         message: 'Authentication required'
       });
-      return;
     }
 
     if (!roles.includes(req.user.role)) {
-      res.status(403).json({
+      return res.status(403).json({
         success: false,
         message: 'Insufficient permissions'
       });
-      return;
     }
 
     next();
   };
 };
 
-export const requireAdmin = requireRole(['ADMIN']);
-export const requireClient = requireRole(['CLIENT']);
+export const optionalAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  try {
+    const authHeader = req.headers.authorization;
+    
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      const payload = verifyAccessToken(token);
+      
+      const user = await prisma.user.findUnique({
+        where: { id: payload.userId },
+        select: {
+          id: true,
+          email: true,
+          fullName: true,
+          role: true,
+          status: true,
+          isEmailVerified: true,
+        }
+      });
+
+      if (user && user.status === 'ACTIVE') {
+        req.user = user as any;
+      }
+    }
+    
+    next();
+  } catch (error) {
+    // Continue without authentication for optional auth
+    next();
+  }
+};

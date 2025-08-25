@@ -11,364 +11,351 @@ datasource db {
 }
 
 model User {
-  id           Int      @id @default(autoincrement())
+  id           String   @id @default(cuid())
   email        String   @unique
   passwordHash String
-  fullName     String?
-  firstName    String?
-  lastName     String?
-  cinNumber    String?  @unique
-  phoneNumber  String?
+  fullName     String
+  cin          String?  @unique
+  phone        String?
   role         Role     @default(CLIENT)
-  status       UserStatus @default(ACTIVE)
-  isVerified   Boolean  @default(false)
-  lastLoginAt  DateTime?
+  status       UserStatus @default(PENDING)
+  isEmailVerified Boolean @default(false)
+  emailVerificationToken String?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  mfaEnabled   Boolean  @default(false)
+  mfaSecret    String?
+  lastLogin    DateTime?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   // Relations
-  refreshTokens     RefreshToken[]
-  passwordResets    PasswordReset[]
-  otpCodes          OtpCode[]
+  kycInfo      KycInfo?
+  accounts     Account[]
+  transactions Transaction[]
   checkbookRequests CheckbookRequest[]
   creditCardRequests CreditCardRequest[]
-  accountRequests   AccountRequest[]
-  tfBankRequests    TfBankRequest[]
-  contactInquiries  ContactInquiry[]
-  kycInfo           KycInfo?
-  accounts          Account[]
-  transactions      Transaction[]
-  kycModifications  KycModificationRequest[]
-  documents         Document[]
+  accountOpeningRequests AccountOpeningRequest[]
+  tfAccountRequests TFAccountRequest[]
+  contactInquiries ContactInquiry[]
+  documents    Document[]
+  blogPosts    BlogPost[]
 
   @@map("users")
 }
 
-model RefreshToken {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  userId    Int
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("refresh_tokens")
-}
-
-model PasswordReset {
-  id        Int      @id @default(autoincrement())
-  token     String   @unique
-  userId    Int
-  expiresAt DateTime
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("password_resets")
-}
-
-model OtpCode {
-  id        Int      @id @default(autoincrement())
-  code      String
-  userId    Int
-  type      OtpType
-  expiresAt DateTime
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("otp_codes")
-}
-
-model Document {
-  id       Int          @id @default(autoincrement())
-  userId   Int
-  filename String
-  originalName String
-  mimeType String
-  size     Int
-  path     String
-  type     DocumentType
-  createdAt DateTime   @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("documents")
-}
-
-model CheckbookRequest {
-  id           Int           @id @default(autoincrement())
-  userId       Int
-  phoneNumber  String
-  email        String
-  rib          String
-  checkbookType String
-  idType       String
-  idNumber     String
-  status       RequestStatus @default(PENDING)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("checkbook_requests")
-}
-
-model CreditCardRequest {
-  id          Int           @id @default(autoincrement())
-  userId      Int
-  phoneNumber String
-  cardType    String
-  email       String
-  rib         String
-  maxTPE      String
-  idType      String
-  idNumber    String
-  status      RequestStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("credit_card_requests")
-}
-
-model AccountRequest {
-  id          Int           @id @default(autoincrement())
-  userId      Int
-  accountType String
-  description String?
-  status      RequestStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("account_requests")
-}
-
-model TfBankRequest {
-  id          Int           @id @default(autoincrement())
-  userId      Int
-  packageType String        // 'student' or 'elyssa'
-  description String?
-  status      RequestStatus @default(PENDING)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("tf_bank_requests")
-}
-
-model ContactInquiry {
-  id          Int                @id @default(autoincrement())
-  userId      Int?
-  name        String
-  email       String
-  phone       String?
-  subject     String
-  message     String
-  category    ContactCategory    @default(GENERAL)
-  priority    ContactPriority    @default(MEDIUM)
-  status      ContactStatus      @default(PENDING)
-  assignedTo  Int?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
-
-  @@map("contact_inquiries")
-}
-
 model KycInfo {
-  id                    Int      @id @default(autoincrement())
-  userId                Int      @unique
-  title                 String?
-  countryOfBirth        String?
-  dateOfBirth           DateTime?
-  address               String?
-  reason                String?
-  relationshipType      String?
-  status                String?
-  natureOfActivity      String?
-  primaryNationality    String?
-  otherNationality      String?
-  motherFullName        String?
-  fatherFullName        String?
-  maritalStatus         String?
-  residence             String?
-  cinNumber             String?
-  dateOfIssue           DateTime?
-  selectedAgencyNumber  String?
-  accountType           String?
-  accountCurrency       String?
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Personal Information
+  dateOfBirth DateTime?
+  placeOfBirth String?
+  nationality  String?
+  maritalStatus String?
+  occupation   String?
+  employer     String?
+  monthlyIncome Decimal?
+  
+  // Address Information
+  address      String?
+  city         String?
+  postalCode   String?
+  country      String?
+  
+  // Identity Documents
+  cinNumber    String?
+  cinIssueDate DateTime?
+  cinExpiryDate DateTime?
+  passportNumber String?
+  passportIssueDate DateTime?
+  passportExpiryDate DateTime?
+  
+  // Banking Information
+  bankName     String?
+  accountNumber String?
+  iban         String?
+  
+  // Status
+  status       KycStatus @default(PENDING)
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  notes        String?
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("kyc_info")
 }
 
-model KycModificationRequest {
-  id           Int                      @id @default(autoincrement())
-  userId       Int
-  fieldName    String
-  fieldLabel   String
-  oldValue     String
-  newValue     String
-  reason       String
-  status       KycModificationStatus    @default(PENDING)
-  adminId      Int?
-  decisionDate DateTime?
-  createdAt    DateTime                 @default(now())
-  updatedAt    DateTime                 @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("kyc_modification_requests")
-}
-
 model Account {
-  id                  Int           @id @default(autoincrement())
-  userId              Int
-  rib                 String        @unique
-  iban                String        @unique
-  type                String
-  balance             Decimal       @default(0.00) @db.Decimal(15, 2)
-  creationDate        DateTime      @default(now())
-  status              AccountStatus @default(ACTIVE)
-  number              String        @unique
-  overdraftAuthorized Decimal       @default(0.00) @db.Decimal(15, 2)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  id            String      @id @default(cuid())
+  userId        String
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountNumber String      @unique
+  accountType   AccountType
+  balance       Decimal     @default(0)
+  currency      String      @default("TND")
+  status        AccountStatus @default(ACTIVE)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions Transaction[]
+  // Relations
+  transactions  Transaction[]
 
   @@map("accounts")
 }
 
 model Transaction {
-  id              Int             @id @default(autoincrement())
-  accountId       Int
-  type            TransactionType
-  amount          Decimal         @db.Decimal(15, 2)
-  label           String
-  description     String?
-  transactionDate DateTime        @default(now())
-  createdAt       DateTime        @default(now())
-
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  id          String          @id @default(cuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId   String
+  account     Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  
+  type        TransactionType
+  amount      Decimal
+  currency    String          @default("TND")
+  description String?
+  reference   String?
+  status      TransactionStatus @default(COMPLETED)
+  
+  // For transfers
+  fromAccount String?
+  toAccount   String?
+  
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 
   @@map("transactions")
 }
 
+model CheckbookRequest {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountNumber String
+  checkbookType String
+  quantity    Int           @default(1)
+  deliveryAddress String?
+  status      RequestStatus @default(PENDING)
+  notes       String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("checkbook_requests")
+}
+
+model CreditCardRequest {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  cardType    String
+  creditLimit Decimal?
+  monthlyIncome Decimal?
+  employmentStatus String?
+  status      RequestStatus @default(PENDING)
+  notes       String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("credit_card_requests")
+}
+
+model AccountOpeningRequest {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountType String
+  initialDeposit Decimal?
+  purpose     String?
+  status      RequestStatus @default(PENDING)
+  notes       String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("account_opening_requests")
+}
+
+model TFAccountRequest {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountType String
+  amount      Decimal
+  duration    Int           // in months
+  interestRate Decimal?
+  status      RequestStatus @default(PENDING)
+  notes       String?
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("tf_account_requests")
+}
+
+model ContactInquiry {
+  id          String        @id @default(cuid())
+  userId      String?
+  user        User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  status      InquiryStatus @default(OPEN)
+  priority    Priority      @default(MEDIUM)
+  assignedTo  String?
+  response    String?
+  respondedAt DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@map("contact_inquiries")
+}
+
+model Document {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type        DocumentType
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  path        String
+  status      DocumentStatus @default(PENDING)
+  uploadedAt  DateTime     @default(now())
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  notes       String?
+
+  @@map("documents")
+}
+
 model BlogPost {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String   @db.Text
-  excerpt   String?
-  author    String
-  category  String?
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  content     String   @db.Text
+  excerpt     String?
+  coverImage  String?
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  status      PostStatus @default(DRAFT)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("blog_posts")
 }
 
 model SystemSetting {
-  id    Int    @id @default(autoincrement())
-  key   String @unique
-  value String @db.Text
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String   @db.Text
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   @@map("system_settings")
 }
 
 // Enums
 enum Role {
-  CLIENT
   ADMIN
+  CLIENT
 }
 
 enum UserStatus {
+  PENDING
   ACTIVE
   SUSPENDED
-  PENDING_VERIFICATION
+  INACTIVE
+}
+
+enum KycStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  UNDER_REVIEW
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  BUSINESS
+  STUDENT
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  CLOSED
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAWAL
+  TRANSFER
+  PAYMENT
+  FEE
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
 }
 
 enum RequestStatus {
   PENDING
   APPROVED
   REJECTED
-  PROCESSING
+  UNDER_REVIEW
 }
 
-enum KycModificationStatus {
-  PENDING
-  APPROVED
-  REJECTED
+enum InquiryStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
 }
 
-enum ContactCategory {
-  GENERAL
-  TECHNICAL
-  BILLING
-  COMPLAINT
-  SUGGESTION
-}
-
-enum ContactPriority {
+enum Priority {
   LOW
   MEDIUM
   HIGH
   URGENT
 }
 
-enum ContactStatus {
-  PENDING
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-}
-
-enum OtpType {
-  LOGIN_MFA
-  PASSWORD_RESET
-  PHONE_VERIFICATION
-  EMAIL_VERIFICATION
-}
-
 enum DocumentType {
-  CIN_FRONT
-  CIN_BACK
-  SELFIE
+  CIN
   PASSPORT
+  SELFIE
   PROOF_OF_ADDRESS
-  PROOF_OF_INCOME
-  STUDENT_VISA
-  ENROLLMENT_CONFIRMATION
-  SCHOLARSHIP_PROOF
-  RESIDENCE_PERMIT
+  INCOME_STATEMENT
+  OTHER
 }
 
-enum AccountStatus {
-  ACTIVE
-  SUSPENDED
-  CLOSED
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
-enum TransactionType {
-  CREDIT
-  DEBIT
-  TRANSFER_IN
-  TRANSFER_OUT
-  FEE
-  INTEREST
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
 }

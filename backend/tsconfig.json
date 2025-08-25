@@ -1,45 +1,39 @@
 {
   "compilerOptions": {
     "target": "ES2020",
+    "module": "commonjs",
     "lib": ["ES2020"],
-    "module": "CommonJS",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
     "strict": true,
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "declaration": true,
-    "outDir": "./dist",
-    "rootDir": "./src",
+    "declarationMap": true,
+    "sourceMap": true,
     "removeComments": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
+    "noImplicitThis": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "exactOptionalPropertyTypes": true,
-    "baseUrl": "./src",
+    "moduleResolution": "node",
+    "baseUrl": "./",
     "paths": {
-      "@/*": ["./*"],
-      "@/controllers/*": ["./controllers/*"],
-      "@/services/*": ["./services/*"],
-      "@/middlewares/*": ["./middlewares/*"],
-      "@/models/*": ["./models/*"],
-      "@/routes/*": ["./routes/*"],
-      "@/utils/*": ["./utils/*"],
-      "@/types/*": ["./types/*"]
-    }
+      "@/*": ["src/*"]
+    },
+    "allowSyntheticDefaultImports": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "**/*.test.ts"
+    "dist"
   ]
 }
