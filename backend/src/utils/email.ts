@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { EmailOptions } from '@/types';
 
-const transporter = nodemailer.createTransporter({
+const transporter = nodemailer.createTransport({
   host: process.env.MAIL_HOST,
   port: parseInt(process.env.MAIL_PORT || '587'),
   secure: false, // true for 465, false for other ports

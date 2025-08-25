@@ -281,4 +281,38 @@ export class AuthService {
 
     return true;
   }
+
+  static async verifyResetToken(token: string): Promise<boolean> {
+    const resetRecord = await prisma.passwordReset.findUnique({
+      where: { token }
+    });
+
+    return !!(resetRecord && !resetRecord.used && resetRecord.expiresAt > new Date());
+  }
+
+  static async verifyEmail(token: string): Promise<void> {
+    // This would typically verify an email verification token
+    // For now, we'll just mark the user as verified
+    const user = await prisma.user.findFirst({
+      where: { email: { contains: token } } // Simplified for demo
+    });
+
+    if (user) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { isVerified: true }
+      });
+    }
+  }
+
+  static async resendVerification(email: string): Promise<void> {
+    const user = await prisma.user.findUnique({
+      where: { email }
+    });
+
+    if (user && !user.isVerified) {
+      // Send verification email (simplified)
+      await sendOTPEmail(email, 'VERIFY', 'EMAIL_VERIFICATION');
+    }
+  }
 }
